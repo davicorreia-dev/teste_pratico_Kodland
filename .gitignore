@@ -1,0 +1,24 @@
+# Ignorar ambiente virtual
+venv/
+
+# Cache do Python
+pycache/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos temporários
+*.log
+*.tmp
+*.swp
+*.DS_Store
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Build e distribuições
+build/
+dist/
+*.egg-info/
