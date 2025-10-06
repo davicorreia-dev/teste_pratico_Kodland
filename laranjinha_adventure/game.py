@@ -3,7 +3,8 @@ import random
 import math
 from pygame import Rect
 
-# CONSTANTES GLOBAIS 
+# CONSTANTES GLOBAIS
+TITLE = "Laranjinha Adventure"  
 WIDTH = 800
 HEIGHT = 600
 GRAVITY = 0.5
@@ -229,7 +230,7 @@ def reset_game():
     for start_x in enemy_start_x:
         enemies.append(Enemy(start_x, start_y))
         
-    # Inicialização do Actor
+    # Inicialização do Actor da Bandeira
     global goal_actor
     goal_actor = Actor('goal.png') 
     goal_actor.center = goal_rect.center
