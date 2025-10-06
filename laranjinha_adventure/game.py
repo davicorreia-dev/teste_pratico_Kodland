@@ -18,7 +18,7 @@ GROUND_TOP = HEIGHT - 50
 # VARIÁVEIS DE ESTADO 
 game_state = 'menu'
 selected_option = 0
-menu_options = ['Começar Jogo', 'Ativar/Desativar Som', 'Sair'] 
+menu_options = ['Começar Jogo', 'Ativar ou Desativar Som', 'Sair do Jogo'] 
 sound_enabled = True
 hero = None
 platforms = []
@@ -90,6 +90,7 @@ class AnimatedSprite:
                     self.rect.bottom = p.top
                     self.vy = 0
                     self.on_ground = True
+
                 elif self.vy < 0: # Pulando para cima
                     self.rect.top = p.bottom 
                     self.vy = 0
@@ -117,15 +118,6 @@ class AnimatedSprite:
             img = self.idle_images[-1] # Frame de pulo
                 
         self.actor.image = img
-        
-        # Garante que a escala visual do Actor seja SPRITE_HEIGHT
-        try:
-            ch = self.actor.image.get_height()
-            if ch > 0:
-                self.actor.scale = SPRITE_HEIGHT / ch
-        except Exception:
-            self.actor.scale = 1.0
-            
         self.update_position()
         self.actor.flip_x = not self.facing_right
 
@@ -195,9 +187,9 @@ def reset_game():
     enemies.clear()
     
     # Cria os inimigos em posições fixas
-    ey = GROUND_TOP - SPRITE_HEIGHT 
-    for ex in enemy_start_x:
-        enemies.append(Enemy(ex, ey))
+    start_y = GROUND_TOP - SPRITE_HEIGHT 
+    for start_x in enemy_start_x:
+        enemies.append(Enemy(start_x, start_y))
         
     global goal_actor
     goal_actor = Actor('goal.png') 
@@ -207,8 +199,10 @@ def reset_game():
     try:
         if sound_enabled and not music.is_playing('background'):
             music.play('background') 
+
         elif not sound_enabled:
             music.pause()
+
     except Exception:
         pass
 
@@ -302,10 +296,10 @@ def draw():
         screen.draw.text('Laranjinha Adventure', center=(WIDTH/2, 150), fontsize=48, color='white')
         
         # Exibe a opção de som no menu
-        d = list(menu_options)
-        d[1] = f"Som: {'Ativado' if sound_enabled else 'Desativado'}"
+        display_options = list(menu_options)
+        display_options[1] = f"Som: {'Ativado' if sound_enabled else 'Desativado'}"
             
-        for i, option in enumerate(d):
+        for i, option in enumerate(display_options):
             color = 'yellow' if i == selected_option else 'white'
             screen.draw.text(option, center=(WIDTH/2, 250 + i*60), fontsize=32, color=color)
             
@@ -319,7 +313,7 @@ def draw():
         if hero: hero.actor.draw()
         for enemy in enemies: enemy.actor.draw()
 
-        if game_state == 'game_over': #Tela de Game Over
+        if game_state == 'game_over': # Tela de Game Over
             screen.draw.filled_rect(Rect(0,0,WIDTH,HEIGHT),(0,0,0,128))
             screen.draw.text(game_over_reason, center=(WIDTH/2, HEIGHT/2-50), fontsize=32, color='white')
             screen.draw.text('Pressione ENTER ou ESPAÇO para voltar ao menu', center=(WIDTH/2, HEIGHT/2+50), fontsize=20, color='white')
