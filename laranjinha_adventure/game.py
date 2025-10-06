@@ -35,7 +35,7 @@ try:
         music.pause()
 
 except Exception:
-    print("Aviso: Arquivos de som 'background' ou 'jump' podem estar faltando.")
+    print("Aviso: Arquivos de som podem estar faltando.")
     pass
 
 
@@ -216,21 +216,40 @@ def reset_game():
 
 def check_goal_collision():
     global game_state, game_over_reason
+
     if hero and hero.rect.colliderect(goal_rect):
         game_state = 'game_over'
         game_over_reason = 'Você Passou de Fase!'
 
 def check_enemy_collision():
     global game_state, game_over_reason
+    
+    # Sai se o jogo não estiver jogando
+    if game_state != 'playing':
+        return
+
     for enemy in enemies:
         if hero and hero.rect.colliderect(enemy.rect):
             game_state = 'game_over'
             game_over_reason = 'Game Over! Você foi pego!'
+            
+            global sound_enabled
+            if sound_enabled:
+                try:
+                    music.stop()
+                    sounds.impact.set_volume(1.0)
+                    sounds.impact.play(0)
+                    
+                except Exception:
+                    print("ERRO DE SOM: Não foi possível tocar 'impact.ogg'.")
+                    pass
+            
+            return
 
 def update():
     if game_state == 'playing' and hero:
-        dx = int(keyboard.right) - int(keyboard.left)
-        hero.move(dx)
+        direction_x = int(keyboard.right) - int(keyboard.left)
+        hero.move(direction_x)
 
         if keyboard.space:
             hero.jump()
@@ -321,7 +340,7 @@ def draw():
 
         for enemy in enemies:
             enemy.actor.draw()
-            
+
         if game_state == 'game_over':
             screen.draw.filled_rect(Rect(0,0,WIDTH,HEIGHT),(0,0,0,128))
             screen.draw.text(game_over_reason, center=(WIDTH/2, HEIGHT/2-50), fontsize=32, color='white')
