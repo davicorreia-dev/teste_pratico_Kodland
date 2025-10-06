@@ -80,12 +80,11 @@ class AnimatedSprite:
         self.actor.pos = (self.rect.centerx, self.rect.bottom + offset_y) 
 
     def check_collisions(self, platforms_list):
-        # 1. Movimenta o rect (simula a tentativa de movimento)
-        self.rect.x += (self.facing_right * 2 - 1) * self.is_moving * 4 
+        # Determina a direção do movimento.
+        self.rect.x += (self.facing_right * 2 - 1) * self.is_moving * self.speed 
 
-        # 2. LÓGICA DE COLISÃO HORIZONTAL CORRIGIDA
+        # Lógica da colisão horizontal 
         for p in platforms_list:
-             # Verifica colisão horizontal, ignorando se o topo ou base estiverem muito próximos (para priorizar a colisão vertical)
              if self.rect.colliderect(p) and (self.rect.bottom > p.top + 5 and self.rect.top < p.bottom - 5):
                  # Empurra o sprite para fora da plataforma
                  if self.facing_right:
@@ -135,7 +134,7 @@ class AnimatedSprite:
                 
         self.actor.image = img
         
-        # CORREÇÃO: Usamos 'hasattr' para verificar se a imagem foi carregada antes de chamar get_height()
+        # Evitar erro de não carregar a imagem
         if hasattr(self.actor.image, 'get_height'):
              self.actor.scale = SPRITE_SIZE / self.actor.image.get_height()
             
@@ -153,7 +152,7 @@ class Hero(AnimatedSprite):
     def move(self, dx):
         self.is_moving = dx != 0
         if dx != 0:
-            # O movimento de 'self.rect.x' não é feito aqui, é feito no check_collisions (DRY)
+            # O movimento de 'self.rect.x' não é feito aqui, é feito no check_collisions
             self.facing_right = dx > 0
 
     def jump(self):
@@ -181,7 +180,7 @@ class Enemy(AnimatedSprite):
         self.facing_right = self.direction > 0
         
     def move(self):
-        # O rect.x é movido pelo AnimatedSprite.check_collisions, aqui apenas definimos a direção
+        # O rect.x é movido pelo AnimatedSprite.check_collisions, aqui apenas defini a direção
         pass 
 
     def update(self, platforms_list):
@@ -210,14 +209,13 @@ class Enemy(AnimatedSprite):
         
         self.actor.image = img
         
-        # CORREÇÃO: Usamos 'hasattr' para verificar se a imagem foi carregada antes de chamar get_height()
         if hasattr(self.actor.image, 'get_height'):
              self.actor.scale = SPRITE_SIZE / self.actor.image.get_height()
             
         self.update_position()
         self.actor.flip_x = not self.facing_right
 
-# FUNÇÕES GLOBAIS DE JOGO
+# FUNÇÕES GLOBAIS DO JOGO
 def reset_game():
     global hero, platforms, goal_actor, enemies
     
@@ -240,8 +238,10 @@ def reset_game():
     try:
         if sound_enabled and not music.is_playing('background'):
             music.play('background') 
+
         elif not sound_enabled:
             music.pause()
+
     except Exception:
         pass
 
@@ -265,8 +265,11 @@ def check_collisions():
 def update():
     if game_state == 'playing' and hero:
         hero.move(int(keyboard.right) - int(keyboard.left))
+
         if keyboard.space: hero.jump()
+
         hero.update(platforms)
+
         for enemy in enemies: enemy.update(platforms)
         check_collisions()
 
@@ -295,6 +298,7 @@ def on_key_down(key):
             game_state = 'menu'
             try:
                 if sound_enabled: music.play('background')
+                
             except Exception: pass
 
 def draw():
